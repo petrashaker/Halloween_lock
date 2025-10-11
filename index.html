@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halloweenský kódový zámek</title>
+  <style>
+    body {
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+      color: #f2f2f2;
+      font-family: 'Creepster', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      color: #ff0000;
+      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff3300;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .panel {
+      background: linear-gradient(145deg, #111, #1b1b1b);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+    }
+    .slots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .slot input {
+      width: 50px;
+      height: 70px;
+      text-align: center;
+      font-size: 2em;
+      font-weight: bold;
+      color: #ff0000;
+      background: #000;
+      border: 2px solid #ff3300;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff3300 inset;
+    }
+    button {
+      background: #ff3300;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #cc0000;
+    }
+    .blood {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(200, 0, 0, 0.8);
+      clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+      transition: clip-path 1s ease-in-out;
+      z-index: 5;
+    }
+    .blood.active {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    .ghost {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      text-align: center;
+      font-size: 2rem;
+      z-index: 10;
+      text-shadow: 0 0 12px rgba(255,0,0,.5);
+    }
+    .img {
+      height: 100vh;
+      width: 100vw;
+    }
+    .ghost.show {
+      display: block;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Halloweenský kódový zámek</h1>
+    <p>Zadejte správný kód a bojte se!</p>
+    <div class="slots">
+      <div class="slot"><input maxlength="1"></div>
+      <div class="slot"><input maxlength="1"></div>
+      <div class="slot"><input maxlength="1"></div>
+      <div class="slot"><input maxlength="1"></div>
+      <div class="slot"><input maxlength="1"></div>
+      <div class="slot"><input maxlength="1"></div>
+    </div>
+    <button id="submit">Odemknout</button>
+    <button id="reset">Vymazat</button>
+    <div class="blood" id="blood"></div>
+  </div>
+  <div class="ghost" id="ghost">
+    <img src="./img/duch pudy gif.gif" alt="ghost" class="img" />
+    <audio autoplay id="sound">
+      <source src="./sound/duch pudy final final final.mp3" type="audio/mpeg">
+    </audio>  
+  </div>
+  <script>
+    const CORRECT = [2, 4, 1, 0, 2, 5];
+    const inputs = document.querySelectorAll('.slot input');
+    const submit = document.getElementById('submit');
+    const reset = document.getElementById('reset');
+    const blood = document.getElementById('blood');
+    const ghost = document.getElementById('ghost');
+    const sound = document.getElementById('sound');
+
+    // Autofocus next input after one digit
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+    });
+
+    submit.addEventListener('click', () => {
+      const code = Array.from(inputs).map(i => parseInt(i.value, 10));
+      if (code.every((num, idx) => num === CORRECT[idx])) {
+        document.querySelector('.panel').style.display = 'none';
+        ghost.classList.add('show');
+        sound.classList.add('show');
+        // Play sound once it gets the class 'show'
+        sound.play().catch(err => {
+          console.warn('Autoplay blocked:', err);
+        });
+      } else {
+        blood.classList.add('active');
+        setTimeout(() => blood.classList.remove('active'), 1500);
+      }
+    });
+
+    reset.addEventListener('click', () => {
+      inputs.forEach(i => i.value = '');
+      inputs[0].focus();
+    });
+    
+    sound.pause();
+    sound.currentTime = 0;
+  </script>
+</body>
+</html>
